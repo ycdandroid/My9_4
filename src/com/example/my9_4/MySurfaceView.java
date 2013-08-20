@@ -1,5 +1,6 @@
 package com.example.my9_4;
 
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -13,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class MySurfaceView extends GLSurfaceView {
@@ -55,21 +57,41 @@ public class MySurfaceView extends GLSurfaceView {
 
 		float xAngle;
 		float yAngle;
+		
+		LoadedObjectVertexNormalTexture lovo;
+		
 		@Override
 		public void onDrawFrame(GL10 arg0) {
+			GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+			MatrixState.pushMatrix();
+			MatrixState.translate(0, -2, -25);
+			MatrixState.rotate(xAngle, 1, 0, 0);
+			MatrixState.rotate(yAngle, 0, 1, 0);
 			
+			if (lovo != null) {
+				lovo.drawSelf(textureId);
+			}
+			MatrixState.popMatrix();
 		}
 
 		@Override
-		public void onSurfaceChanged(GL10 arg0, int arg1, int arg2) {
-			// TODO Auto-generated method stub
-			
+		public void onSurfaceChanged(GL10 arg0, int width, int height) {
+			GLES20.glViewport(0, 0, width, height);
+			float ratio = (float)width/height;
+			MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 2, 100);
+			MatrixState.setCamera(0, 0, 0, 0, 0, -1, 0, 1, 0);
 		}
 
 		@Override
 		public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
-			// TODO Auto-generated method stub
+			GLES20.glClearColor(0.5f, 0, 0, 1);
+			GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+			GLES20.glEnable(GLES20.GL_CULL_FACE);
 			
+			MatrixState.setInitStack();
+			MatrixState.setLightLocation(40, 10, 20);
+			lovo = LoadUtil.loadFromFile("ch_t.obj", MySurfaceView.this.getResources(), MySurfaceView.this);
+			textureId = initTexture(R.drawable.ghxp);
 		}
 		
 	}

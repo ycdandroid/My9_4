@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import android.R.integer;
+
+
 import android.content.res.Resources;
 import android.util.Log;
 import android.view.View;
@@ -52,8 +53,8 @@ public class LoadUtil {
 	 * @param view 视图对象
 	 * @return
 	 */
-	public static LoadedObjectVertexOnly loadFromFile(String fname, Resources r, View view ){
-		LoadedObjectVertexOnly lo = null;
+	public static LoadedObjectVertexNormalTexture loadFromFile(String fname, Resources r, View view ){
+		LoadedObjectVertexNormalTexture lo = null;
 		ArrayList<Float> alv = new ArrayList<Float>(); //原始顶点列表
 		ArrayList<Float> alvResult = new ArrayList<Float>();//结果顶点列表
 		ArrayList<Integer> alFaceIndex = new ArrayList<Integer>(); //顶点组装面索引列表,每个顶点的编号
@@ -62,8 +63,9 @@ public class LoadUtil {
     	//此HashMap的key为点的索引， value为点所在的各个面的法向量的集合
 		HashMap<Integer, HashSet<Normal>> hmn = new HashMap<Integer, HashSet<Normal>>();
 		
-		ArrayList<Float> alt = new ArrayList<Float>();
-		ArrayList<Float> altResult = new ArrayList<Float>();
+    	ArrayList<Float> alt = new ArrayList<Float>();  
+    	//纹理坐标结果列表
+    	ArrayList<Float> altResult = new ArrayList<Float>(); 
 		
 		try {
 			InputStream in = r.getAssets().open(fname);
@@ -92,17 +94,17 @@ public class LoadUtil {
 		      		alvResult.add(z0);
 					
 					index[1] = Integer.parseInt(tempsa[2].split("/")[0]) - 1;//因为行号是从1开始的，因此要减去1
-					float x1 = alv.get(3*index[0]); //因为每一行x,y,z坐标，alv各添加1次
-					float y1 = alv.get(3*index[0] + 1);
-					float z1 = alv.get(3*index[0] + 2);
+					float x1 = alv.get(3*index[1]); //因为每一行x,y,z坐标，alv各添加1次
+					float y1 = alv.get(3*index[1] + 1);
+					float z1 = alv.get(3*index[1] + 2);
 					alvResult.add(x1);
 		      		alvResult.add(y1);
 		      		alvResult.add(z1);
 					
 					index[2] = Integer.parseInt(tempsa[3].split("/")[0]) - 1;//因为行号是从1开始的，因此要减去1
-					float x2 = alv.get(3*index[0]); //因为每一行x,y,z坐标，alv各添加1次
-					float y2 = alv.get(3*index[0] + 1);
-					float z2 = alv.get(3*index[0] + 2);
+					float x2 = alv.get(3*index[2]); //因为每一行x,y,z坐标，alv各添加1次
+					float y2 = alv.get(3*index[2] + 1);
+					float z2 = alv.get(3*index[2] + 2);
 					alvResult.add(x2);
 		      		alvResult.add(y2);
 		      		alvResult.add(z2);
@@ -172,13 +174,15 @@ public class LoadUtil {
 				tST[i] = altResult.get(i);
 			}
 			
-			lo = new LoadedObjectVertexOnly(view, vXYZ, nXYZ, tST);
+			lo = new LoadedObjectVertexNormalTexture(view, vXYZ, nXYZ, tST);
 			
 		} catch (Exception e) {
 			Log.d("loatutil", "loadFromFile"+fname+"error");
 			e.printStackTrace();
 		}
 		
+    	
+    	
 		return lo;
 	}
 	
